@@ -4,7 +4,7 @@ using PTMK_Test.Core.Implementation.Models;
 using PTMK_Test.Infrastructure.Implementation;
 using System.Diagnostics;
 
-namespace PTMK_Test.Web.Endpoints.Tests
+namespace PTMK_Test.Web.Endpoints
 {
     public static class DebugEnpointsMapper
     {

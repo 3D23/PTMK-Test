@@ -6,10 +6,6 @@ using PTMK_Test.Core.Implementation.Models;
 using PTMK_Test.Infrastructure.Implementation;
 using PTMK_Test.Web.Endpoints;
 
-#if DEBUG
-using PTMK_Test.Web.Endpoints.Tests;
-#endif
-
 #region Builder Registrations
 
 var builder = WebApplication.CreateBuilder(args);
@@ -192,10 +188,7 @@ app.UseHttpsRedirection();
 
 #region Mapping Endpoints
 
-#if DEBUG
 app.MapDebugs();
-#endif
-
 app.MapEmployees();
 app.MapApplications();
 
