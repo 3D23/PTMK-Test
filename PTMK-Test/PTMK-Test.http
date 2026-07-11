@@ -1,0 +1,6 @@
+@PTMK_Test_HostAddress = http://localhost:5153
+
+GET {{PTMK_Test_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
