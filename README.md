@@ -2,11 +2,18 @@
 
 Проект написан на Asp.Net Core Minimal API, C# 10 и EF NET Core 10.
 
-Для запуска необходима .NET SDK 10 (посмотреть версию через `dotnet --version`)
-- перейти в корневую папку PTMK-Test и выполнить команды:
-- `dotnet restore` - Решение зависимостей;
-- `dotnet run --project PTMK-Test -c Release` - Сборка и запуск проекта;
-- Перейти по http://localhost:5153/swagger/index.html
+Для запуска необходима .NET SDK 10
+
+1. Проверяем, что .NET SDK установлен
+`dotnet --version`
+2. Переходим в папку проекта
+`cd путь\к\папке\PTMK-Test`
+3. Восстанавливаем зависимости
+`dotnet restore`
+4. Запускаем приложение
+`dotnet run --project PTMK-Test -c Release`
+5. Открываем в браузере
+`http://localhost:5153/swagger/index.html`
 
 ## Спецификация API
 
