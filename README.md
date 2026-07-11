@@ -1,6 +1,7 @@
 ## Запуск Тестового задания
 
-Проект написан на Asp.Net Core Minimal API, C# 10 и EF NET Core 10.
+Проект написан на Asp.Net Core Minimal API, C# 10 и EF NET Core 10. 
+СУБД: SQLite (InMemory)
 
 Для запуска необходима .NET SDK 10
 
