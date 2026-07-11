@@ -21,7 +21,7 @@ namespace PTMK_Test.Application.Implementation.Application.Commands
 
             bool isTransitionValid = app.TrySetInProgress();
             if (!isTransitionValid)
-                return RequestResult.Failure($"Невозможно перевести заявку {request.ApplicationId} в статус 'В работе' из текущего состояния.");
+                return RequestResult.Failure($"Невозможно перевести заявку {request.ApplicationId} в статус 'In Progress' из текущего состояния.");
 
             await _dbContext.SaveChangeAsync(ct);
 
