@@ -40,6 +40,9 @@ namespace PTMK_Test.Web.Endpoints
 
             appGroup.MapPost("", CreateApplication)
                 .WithName("CreateApplication");
+
+            appGroup.MapDelete("{id:guid}", DeleteApplication)
+                .WithName("DeleteApplication");
         }
 
         #region Endpoints Handlers
@@ -135,6 +138,16 @@ namespace PTMK_Test.Web.Endpoints
             CancellationToken ct)
         {
             var command = new ChangeExecutorCommand(id, newExecutorId);
+            var result = await mediator.Send(command, ct);
+            return result.ToHttpResponse();
+        }
+
+        private static async Task<IResult> DeleteApplication(
+            IMediator mediator,
+            Guid id,
+            CancellationToken ct)
+        {
+            var command = new DeleteApplicationCommand(id);
             var result = await mediator.Send(command, ct);
             return result.ToHttpResponse();
         }
