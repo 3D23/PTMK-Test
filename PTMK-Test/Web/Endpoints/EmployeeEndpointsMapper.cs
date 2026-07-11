@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using PTMK_Test.Application.Common;
 using PTMK_Test.Application.Implementation.Employee.Queries;
+using PTMK_Test.Web.Extensions;
 
 namespace PTMK_Test.Web.Endpoints
 {
@@ -23,7 +24,7 @@ namespace PTMK_Test.Web.Endpoints
         {
             var query = new GetAllEmployeesQuery(pagination);
             var result = await mediator.Send(query, ct);
-            return Results.Ok(result);
+            return result.ToHttpResponse();
         }
 
         #endregion

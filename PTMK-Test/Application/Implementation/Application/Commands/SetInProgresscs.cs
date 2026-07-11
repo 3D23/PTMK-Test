@@ -1,26 +1,31 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using PTMK_Test.Application.Common;
 using PTMK_Test.Application.Interface;
 
 namespace PTMK_Test.Application.Implementation.Application.Commands
 {
-    public readonly record struct TrySetInProgressCommand(Guid ApplicationId) : IRequest<bool>;
+    public readonly record struct TrySetInProgressCommand(Guid ApplicationId) 
+        : IRequest<RequestResult>;
 
-    public sealed class TrySetInProgressHandler(IDbContext dbContext) : IRequestHandler<TrySetInProgressCommand, bool>
+    public sealed class TrySetInProgressHandler(IDbContext dbContext)
+        : IRequestHandler<TrySetInProgressCommand, RequestResult>
     {
         private readonly IDbContext _dbContext = dbContext;
 
-        public async Task<bool> Handle(TrySetInProgressCommand request, CancellationToken ct)
+        public async Task<RequestResult> Handle(TrySetInProgressCommand request, CancellationToken ct)
         {
             var app = await _dbContext.Applications.FirstOrDefaultAsync(a => a.ID == request.ApplicationId, ct);
-            if (app == null) return false;
+            if (app == null)
+                return RequestResult.NotFound($"Заявка с ID {request.ApplicationId} не найдена.");
 
             bool isTransitionValid = app.TrySetInProgress();
+            if (!isTransitionValid)
+                return RequestResult.Failure($"Невозможно перевести заявку {request.ApplicationId} в статус 'В работе' из текущего состояния.");
 
-            if (isTransitionValid)
-                await _dbContext.SaveChangeAsync(ct);
+            await _dbContext.SaveChangeAsync(ct);
 
-            return isTransitionValid;
+            return RequestResult.Success();
         }
     }
 }

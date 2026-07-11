@@ -6,20 +6,25 @@ using PTMK_Test.Application.Interface;
 namespace PTMK_Test.Application.Implementation.Employee.Queries
 {
     public readonly record struct GetAllEmployeesQuery(
-        PaginationParameters Pagination) : IRequest<List<Core.Implementation.Models.Employee>>;
+        PaginationParameters Pagination) 
+        : IRequest<RequestResult<List<Core.Implementation.Models.Employee>>>;
 
     public sealed class GetAllEmployeesHandler(IDbContext dbContext)
-        : IRequestHandler<GetAllEmployeesQuery, List<Core.Implementation.Models.Employee>>
+        : IRequestHandler<GetAllEmployeesQuery, RequestResult<List<Core.Implementation.Models.Employee>>>
     {
         private readonly IDbContext _dbContext = dbContext;
 
-        public async Task<List<Core.Implementation.Models.Employee>> Handle(GetAllEmployeesQuery request, CancellationToken ct)
+        public async Task<RequestResult<List<Core.Implementation.Models.Employee>>> Handle(
+            GetAllEmployeesQuery request,
+            CancellationToken ct)
         {
-            return await _dbContext.Employees
+            var employees = await _dbContext.Employees
                 .OrderBy(e => e.ID)
                 .Skip((request.Pagination.PageNumber - 1) * request.Pagination.PageSize)
                 .Take(request.Pagination.PageSize)
                 .ToListAsync(ct);
+
+            return RequestResult<List<Core.Implementation.Models.Employee>>.Success(employees);
         }
     }
 }

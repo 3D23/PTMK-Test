@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using PTMK_Test.Application.Common;
 using PTMK_Test.Application.Interface;
 
 namespace PTMK_Test.Application.Implementation.Application.Commands
@@ -8,15 +10,18 @@ namespace PTMK_Test.Application.Implementation.Application.Commands
         Guid AuthorId,
         Guid ExecutorId,
         DateTime Deadline,
-        string Description = "") : IRequest<Guid>;
+        string Description = "") : IRequest<RequestResult<Guid>>;
 
     public sealed class CreateApplicationHandler(IDbContext dbContext)
-        : IRequestHandler<CreateApplicationCommand, Guid>
+        : IRequestHandler<CreateApplicationCommand, RequestResult<Guid>>
     {
         private readonly IDbContext _dbContext = dbContext;
 
-        public async Task<Guid> Handle(CreateApplicationCommand request, CancellationToken ct)
+        public async Task<RequestResult<Guid>> Handle(CreateApplicationCommand request, CancellationToken ct)
         {
+             if (await _dbContext.Applications.AnyAsync(a => a.Number == request.Number, ct))
+                return RequestResult<Guid>.Failure("Заявка с таким номером уже существует.");
+
             var application = new Core.Implementation.Models.Application(
                 request.Number,
                 DateTime.UtcNow,
@@ -29,8 +34,7 @@ namespace PTMK_Test.Application.Implementation.Application.Commands
             await _dbContext.Applications.AddAsync(application, ct);
             await _dbContext.SaveChangeAsync(ct);
 
-            return application.ID;
+            return RequestResult<Guid>.Success(application.ID);
         }
-
     }
 }

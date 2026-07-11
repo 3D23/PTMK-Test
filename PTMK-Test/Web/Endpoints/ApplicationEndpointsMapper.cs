@@ -7,6 +7,7 @@ using PTMK_Test.Application.Implementation.Queries;
 using PTMK_Test.Application.Implementation.Specifications.Application;
 using PTMK_Test.Application.Interface;
 using PTMK_Test.Core.Implementation.Enums;
+using PTMK_Test.Web.Extensions; 
 
 namespace PTMK_Test.Web.Endpoints
 {
@@ -50,7 +51,7 @@ namespace PTMK_Test.Web.Endpoints
         {
             var query = new GetAllApplicationsQuery(pagination);
             var result = await mediator.Send(query, ct);
-            return Results.Ok(result);
+            return result.ToHttpResponse();
         }
 
         private static async Task<IResult> GetFilteredApplications(
@@ -70,14 +71,13 @@ namespace PTMK_Test.Web.Endpoints
 
             var query = new GetFilteredApplicationsQuery(specs, pagination, department);
             var result = await mediator.Send(query, ct);
-
-            return Results.Ok(result);
+            return result.ToHttpResponse();
         }
 
         private static async Task<IResult> GetOverdueInProgressByExecutor(
             IMediator mediator,
             Guid executorId,
-            [AsParameters] PaginationParameters pagination, 
+            [AsParameters] PaginationParameters pagination,
             CancellationToken ct = default)
         {
             var specs = new List<IApplicationSpecification>
@@ -94,65 +94,49 @@ namespace PTMK_Test.Web.Endpoints
                 OrderByDeadline: true);
 
             var result = await mediator.Send(query, ct);
-
-            return Results.Ok(result);
+            return result.ToHttpResponse();
         }
 
         private static async Task<IResult> GetAnalyticsReport(
             IMediator mediator,
             CancellationToken ct)
         {
-            var report = await mediator.Send(new GetApplicationsReportQuery(), ct);
-            return Results.Ok(report);
+            var result = await mediator.Send(new GetApplicationsReportQuery(), ct);
+            return result.ToHttpResponse();
         }
 
         private static async Task<IResult> PatchSetInProgress(IMediator mediator, Guid id, CancellationToken ct)
         {
             var command = new TrySetInProgressCommand(id);
-            bool isSuccess = await mediator.Send(command, ct);
-
-            if (!isSuccess)
-                return Results.Problem("Не удалось перевести заявку в работу (недопустимый переход или заявка не найдена).", statusCode: 400);
-
-            return Results.NoContent();
+            var result = await mediator.Send(command, ct);
+            return result.ToHttpResponse();
         }
 
         private static async Task<IResult> CreateApplication(
             IMediator mediator,
-            [FromBody] CreateApplicationCommand command, 
+            [FromBody] CreateApplicationCommand command,
             CancellationToken ct)
         {
-            var applicationId = await mediator.Send(command, ct);
-            return Results.Created($"/api/applications/{applicationId}", new { Id = applicationId });
+            var result = await mediator.Send(command, ct);
+            return result.ToHttpCreated("/api/applications/{0}");
         }
 
         private static async Task<IResult> PatchSetCompleted(IMediator mediator, Guid id, CancellationToken ct)
         {
             var command = new TrySetCompletedCommand(id);
-            bool isSuccess = await mediator.Send(command, ct);
-
-            if (!isSuccess)
-                return Results.Problem("Не удалось завершить заявку (недопустимый переход или заявка не найдена).", statusCode: 400);
-
-            return Results.NoContent();
+            var result = await mediator.Send(command, ct);
+            return result.ToHttpResponse();
         }
 
-        private static async Task<IResult> PatchChangeExecutor(IMediator mediator, Guid id, [FromQuery] Guid newExecutorId, CancellationToken ct)
+        private static async Task<IResult> PatchChangeExecutor(
+            IMediator mediator,
+            Guid id,
+            [FromQuery] Guid newExecutorId,
+            CancellationToken ct)
         {
-            try
-            {
-                var command = new ChangeExecutorCommand(id, newExecutorId);
-                await mediator.Send(command, ct);
-                return Results.NoContent();
-            }
-            catch (ArgumentException ex)
-            {
-                return Results.Problem(ex.Message, statusCode: 400);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.Problem(ex.Message, statusCode: 404);
-            }
+            var command = new ChangeExecutorCommand(id, newExecutorId);
+            var result = await mediator.Send(command, ct);
+            return result.ToHttpResponse();
         }
 
         #endregion

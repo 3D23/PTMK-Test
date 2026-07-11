@@ -7,24 +7,27 @@ using PTMK_Test.Core.Implementation.Enums;
 namespace PTMK_Test.Application.Implementation.Queries
 {
     public sealed record GetFilteredApplicationsQuery(
-        IEnumerable<IApplicationSpecification> Specifications,
-        PaginationParameters Pagination,
-        DepartmentType? Department = null,
-        bool OrderByDeadline = false) : IRequest<List<Core.Implementation.Models.Application>>;
+         IEnumerable<IApplicationSpecification> Specifications,
+         PaginationParameters Pagination,
+         DepartmentType? Department = null,
+         bool OrderByDeadline = false) : IRequest<RequestResult<List<Core.Implementation.Models.Application>>>;
 
     public sealed class GetFilteredApplicationsHandler(IDbContext dbContext)
-        : IRequestHandler<GetFilteredApplicationsQuery, List<Core.Implementation.Models.Application>>
+        : IRequestHandler<GetFilteredApplicationsQuery, RequestResult<List<Core.Implementation.Models.Application>>>
     {
         private readonly IDbContext _dbContext = dbContext;
 
-        public async Task<List<Core.Implementation.Models.Application>> Handle(
-            GetFilteredApplicationsQuery request, 
+        public async Task<RequestResult<List<Core.Implementation.Models.Application>>> Handle(
+            GetFilteredApplicationsQuery request,
             CancellationToken ct)
         {
             var query = _dbContext.Applications.AsQueryable();
 
-            foreach (var spec in request.Specifications)
-                query = query.Where(spec.ToExpression());
+            if (request.Specifications != null)
+            {
+                foreach (var spec in request.Specifications)
+                    query = query.Where(spec.ToExpression());
+            }
 
             if (request.Department.HasValue)
             {
@@ -38,10 +41,12 @@ namespace PTMK_Test.Application.Implementation.Queries
                 ? query.OrderBy(a => a.Deadline)
                 : query.OrderBy(a => a.ID);
 
-            return await orderedQuery
+            var applications = await orderedQuery
                 .Skip((request.Pagination.PageNumber - 1) * request.Pagination.PageSize)
                 .Take(request.Pagination.PageSize)
                 .ToListAsync(ct);
+
+            return RequestResult<List<Core.Implementation.Models.Application>>.Success(applications);
         }
     }
 }
