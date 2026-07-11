@@ -72,9 +72,9 @@
 Основные компоненты решения, зафиксированные в репозитории:
 
 - **`Core`**:  Содержит инкапсулированные сущности `Application` и `Employee`, а также логику переходов конечного автомата состояний и структурные Value Objects (`ApplicationStatus`, `Name`).
-- **`Application`**: Реализация бизнес-логики. Включает в себя интерфейс контекста `IDbContext`, раздельные асинхронные Query/Command-хэндлеры (включая логику создания `CreateApplicationHandler` и построения аналитики `GetApplicationsReportHandler`), а также спецификации фильтрации `Specifications` и общие структуры - `PaginationParameters` и `RequestResult`.
+- **`Application`**: Реализация бизнес-логики. Включает в себя интерфейс контекста `IDbContext`, раздельные асинхронные Query/Command-хэндлеры (включая логику создания `CreateApplicationHandler` и построения аналитики `GetApplicationsReportHandler`), а также спецификации фильтрации `Specifications`, конфигураторы таблиц: `ApplicationConfigurator` и `EmployeeConfigurator` и общие структуры - `PaginationParameters` и `RequestResult`.
 - **`Infrastructure`**: Слой данных. Содержит реализацию контекста `AppDbContext` на базе **Entity Framework Core 10** и маппинги конфигураторов таблиц.
-- **`Web`**: Слой API. Легковесные  **Minimal APIs** (`ApplicationEndpointsMapper`, `EmployeeEndpointsMapper`, `DebugEndpointsMapper`), защищенные встроенными механизмами валидации параметров и пагинации.
+- **`Web`**: Слой API. Легковесные  **Minimal APIs** (`ApplicationEndpointsMapper`, `EmployeeEndpointsMapper`, `DebugEndpointsMapper`), защищенные встроенными механизмами валидации параметров и пагинации, возвращаюь ответ с помощью преобразования `RequestResult` `readonly struct` в `AspNetCore.Http.Result` объект.
 
 ## Краткое описание реализованного бизнес-процесса
 
