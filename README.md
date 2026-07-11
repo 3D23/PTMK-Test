@@ -13,7 +13,7 @@
 4. Запускаем приложение
 `dotnet run --project PTMK-Test -c Release`
 5. Открываем в браузере
-`http://localhost:5153/swagger/index.html`
+`http://localhost:5153/swagger/index.html` (может быть понадобится время для создания БД)
 
 ## Спецификация API
 
